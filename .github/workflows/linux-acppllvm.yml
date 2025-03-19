@@ -30,8 +30,8 @@ jobs:
         id: docker
         with:
           LLVM_VERSION: ${{ matrix.clang }}
-          ROCM_VERSION: ${{ matrix.rocm_or_cuda == 'rocm' && '${{matrix.rocm_version}}' || '' }}
-          CUDA_MAJOR_VERSION: ${{ matrix.rocm_or_cuda == 'cuda' && '${{matrix.cuda}}' || '' }}
+          ROCM_VERSION: ${{ matrix.cuda_or_rocm == 'rocm' && '${{matrix.rocm_version}}' || '' }}
+          CUDA_MAJOR_VERSION: ${{ matrix.cuda_or_rocm == 'cuda' && '${{matrix.cuda}}' || '' }}
           BASE_TAG: ${{ matrix.os }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
       - uses: beacon-biosignals/matrix-output@v1
@@ -76,6 +76,9 @@ jobs:
       if: ${{ matrix.docker.cuda_or_rocm == 'cuda' }}
       run: |
         echo "TARGETS_TO_BUILD=;NVPTX" >> $GITHUB_ENV
+        mkdir -p ${GITHUB_WORKSPACE}/install/lib/
+        cp /opt/AdaptiveCpp/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so
+        cp /opt/AdaptiveCpp/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so.1
     - name: configure build
       if: ${{ matrix.docker.cuda_or_rocm == 'rocm' }}
       run: |

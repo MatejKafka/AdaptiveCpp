@@ -98,6 +98,7 @@ jobs:
           -DLLVM_ADAPTIVECPP_LINK_INTO_TOOLS=ON `
           -DWITH_OPENCL_BACKEND=OFF `
           -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0" `
+          -DBoost_COMPILER="clangw18" `
           -DLLVM_TOOL_BUGPOINT_BUILD=OFF `
           -DOPENMP_ENABLE_LIBOMPTARGET=OFF `
           -DLLVM_INCLUDE_TESTS=OFF `
