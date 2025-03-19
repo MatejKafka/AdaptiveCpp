@@ -45,9 +45,14 @@ jobs:
             image: ${{ steps.docker.outputs.docker_image }}
 
   test-acpp-llvm:
-    name: AdaptiveCpp LLVM ${{ matrix.clang_version }} and ${{ matrix.cuda_or_rocm }}
+    name: AdaptiveCpp LLVM ${{ matrix.clang_version }} and ${{ matrix.docker.cuda_or_rocm }}
     needs: prep-container
     runs-on: ${{ matrix.docker.os }}
+    container:
+      image: ${{ matrix.docker.image }}
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         docker: ${{fromJson(needs.prep-container.outputs.docker_matrix)}}
@@ -61,18 +66,18 @@ jobs:
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
-        key: ${{ github.job }}-${{matrix.clang_version}}-${{matrix.cuda_or_rocm}}
+        key: ${{ github.job }}-${{matrix.clang_version}}-${{matrix.docker.cuda_or_rocm}}
         restore-keys: |
           ${{ github.job }}
     - name: clone LLVM
       run: |
         git clone --recurse-submodules https://github.com/llvm/llvm-project --depth 1 --single-branch -b release/${{matrix.clang_version}}.x llvm
     - name: configure build
-      if: ${{ matrix.cuda_or_rocm == 'cuda' }}
+      if: ${{ matrix.docker.cuda_or_rocm == 'cuda' }}
       run: |
         echo "TARGETS_TO_BUILD=;NVPTX" >> $GITHUB_ENV
     - name: configure build
-      if: ${{ matrix.cuda_or_rocm == 'rocm' }}
+      if: ${{ matrix.docker.cuda_or_rocm == 'rocm' }}
       run: |
         echo "TARGETS_TO_BUILD=;AMDGPU" >> $GITHUB_ENV
         echo "ENABLE_PROJECTS=;lld" >> $GITHUB_ENV
@@ -100,14 +105,14 @@ jobs:
         cmake -GNinja -DACPP_TARGETS="generic" -DAdaptiveCpp_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/AdaptiveCpp ${GITHUB_WORKSPACE}/AdaptiveCpp/tests  -DLLVM_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/llvm
         ninja -j2
     - name: build CUDA tests
-      if: ${{ matrix.cuda_or_rocm == 'cuda' }}
+      if: ${{ matrix.docker.cuda_or_rocm == 'cuda' }}
       run: |
         mkdir ${GITHUB_WORKSPACE}/build/tests-cuda
         cd ${GITHUB_WORKSPACE}/build/tests-cuda
         cmake -GNinja -DACPP_TARGETS="cuda:sm_60" -DAdaptiveCpp_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/AdaptiveCpp ${GITHUB_WORKSPACE}/AdaptiveCpp/tests  -DLLVM_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/llvm
         ninja -j2
     - name: build ROCm tests
-      if: ${{ matrix.cuda_or_rocm == 'rocm' }}
+      if: ${{ matrix.docker.cuda_or_rocm == 'rocm' }}
       run: |
         mkdir ${GITHUB_WORKSPACE}/build/tests-rocm
         cd ${GITHUB_WORKSPACE}/build/tests-rocm
