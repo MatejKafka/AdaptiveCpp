@@ -105,7 +105,7 @@ jobs:
           -DCMAKE_C_COMPILER_LAUNCHER=sccache `
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
 
-        ninja -j2 install
+        ninja install
 
         echo "CC=$env:GITHUB_WORKSPACE\install\bin\clang.exe" >> $env:GITHUB_ENV
         echo "CXX=$env:GITHUB_WORKSPACE\install\bin\clang.exe" >> $env:GITHUB_ENV
@@ -123,8 +123,9 @@ jobs:
           -DAdaptiveCpp_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/AdaptiveCpp" `
           "$env:GITHUB_WORKSPACE/AdaptiveCpp/tests" `
           -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0" `
-          -DBoost_COMPILER="clangw18"
-        ninja -j2
+          -DBoost_COMPILER="clangw18" `
+          -DCMAKE_CXX_FLAGS="-DBOOST_LIB_TOOLSET=clangw18"
+        ninja
     - name: run CPU tests
       run: |
         cd $env:GITHUB_WORKSPACE/build/tests-cpu
@@ -137,7 +138,10 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release `
           -DAdaptiveCpp_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/AdaptiveCpp" `
           "$env:GITHUB_WORKSPACE/AdaptiveCpp/tests" `
-          -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0"
+          -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0" `
+          -DBoost_COMPILER="clangw18" `
+          -DCMAKE_CXX_FLAGS="-DBOOST_LIB_TOOLSET=clangw18"
+
         ninja -j2
     - name: run SSCP CPU tests
       run: |

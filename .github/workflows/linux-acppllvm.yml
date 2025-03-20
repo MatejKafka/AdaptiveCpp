@@ -77,8 +77,8 @@ jobs:
       run: |
         echo "TARGETS_TO_BUILD=;NVPTX" >> $GITHUB_ENV
         mkdir -p ${GITHUB_WORKSPACE}/install/lib/
-        cp /opt/AdaptiveCpp/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so
-        cp /opt/AdaptiveCpp/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so.1
+        cp /opt/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so
+        cp /opt/cuda/lib64/stubs/libcuda.so ${GITHUB_WORKSPACE}/install/lib/libcuda.so.1
     - name: configure build
       if: ${{ matrix.docker.cuda_or_rocm == 'rocm' }}
       run: |
@@ -93,7 +93,7 @@ jobs:
         echo "CC=clang" >> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
         echo "PATH=${GITHUB_WORKSPACE}/install/bin:$PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/install/lib:${GITHUB_WORKSPACE}/install/lib/x86_64-unknown-linux-gnu:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     - name: build CPU tests
       run: |
         mkdir ${GITHUB_WORKSPACE}/build/tests-cpu
@@ -119,13 +119,13 @@ jobs:
       run: |
         mkdir ${GITHUB_WORKSPACE}/build/tests-rocm
         cd ${GITHUB_WORKSPACE}/build/tests-rocm
-        cmake -GNinja -DACPP_TARGETS="hip:gfx906" -DAdaptiveCpp_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/AdaptiveCpp ${GITHUB_WORKSPACE}/AdaptiveCpp/tests  -DLLVM_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/llvm
+        cmake -GNinja -DACPP_TARGETS="hip:gfx906" -DAdaptiveCpp_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/AdaptiveCpp ${GITHUB_WORKSPACE}/AdaptiveCpp/tests -DLLVM_DIR=${GITHUB_WORKSPACE}/install/lib/cmake/llvm
         ninja -j2
     - name: run CPU tests
       run: |
         cd ${GITHUB_WORKSPACE}/build/tests-cpu
-        LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/install/lib ./sycl_tests
+        ./sycl_tests
     - name: run SSCP CPU tests
       run: |
         cd ${GITHUB_WORKSPACE}/build/tests-sscp
-        LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/install/lib ./sycl_tests
+        ./sycl_tests
