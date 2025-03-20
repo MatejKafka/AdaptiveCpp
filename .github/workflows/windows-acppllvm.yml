@@ -50,7 +50,7 @@ jobs:
         Invoke-WebRequest $ninjaURL -OutFile ninja.zip
         Expand-Archive -Path ninja.zip -DestinationPath $env:GITHUB_WORKSPACE\ninja_install
         echo "PATH=$env:GITHUB_WORKSPACE/ninja_install;$env:PATH" >> $env:GITHUB_ENV
-    - name: Cache installed Boost
+    - name: Restore Cache installed Boost
       id: cache-boost-install
       uses: actions/cache/restore@v4
       with:
@@ -74,10 +74,7 @@ jobs:
         .\bootstrap.bat
         .\b2.exe toolset=clang-win address-model=64 variant=release --build-type=complete install --prefix=$env:GITHUB_WORKSPACE/boost/install
 
-        Copy-Item $env:GITHUB_WORKSPACE/boost/install -Destination $env:GITHUB_WORKSPACE -Recurse
-
-    - name: Restore Boost Install cache
-      if: steps.cache-boost-install.outputs.cache-hit == 'true'
+    - name: Copy Boost install to common install folder
       shell: powershell
       run: |
         Copy-Item $env:GITHUB_WORKSPACE/boost/install -Destination $env:GITHUB_WORKSPACE -Recurse
@@ -136,7 +133,7 @@ jobs:
           "$env:GITHUB_WORKSPACE/AdaptiveCpp/tests" `
           -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0" `
           -DBoost_COMPILER="clangw18" `
-          -DCMAKE_CXX_FLAGS='-DBOOST_LIB_TOOLSET="\"clangw18\""'
+          -DCMAKE_CXX_FLAGS='-DBOOST_LIB_TOOLSET=\"clangw18\"'
         ninja
     - name: run CPU tests
       run: |
@@ -152,7 +149,7 @@ jobs:
           "$env:GITHUB_WORKSPACE/AdaptiveCpp/tests" `
           -DBoost_DIR="$env:GITHUB_WORKSPACE/install/lib/cmake/Boost-1.83.0" `
           -DBoost_COMPILER="clangw18" `
-          -DCMAKE_CXX_FLAGS='-DBOOST_LIB_TOOLSET="\"clangw18\""'
+          -DCMAKE_CXX_FLAGS='-DBOOST_LIB_TOOLSET=\"clangw18\"'
 
         ninja -j2
     - name: run SSCP CPU tests
