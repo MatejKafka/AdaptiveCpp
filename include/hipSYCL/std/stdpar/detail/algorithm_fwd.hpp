@@ -130,12 +130,39 @@ HIPSYCL_STDPAR_ENTRYPOINT
 bool none_of(hipsycl::stdpar::par_unseq, ForwardIt first, ForwardIt last,
             UnaryPredicate p );
 
+template<class ForwardIt>
+HIPSYCL_STDPAR_ENTRYPOINT
+bool is_sorted(hipsycl::stdpar::par_unseq, ForwardIt first, ForwardIt last);
+
+template<class ForwardIt, class Compare>
+HIPSYCL_STDPAR_ENTRYPOINT
+bool is_sorted(hipsycl::stdpar::par_unseq, ForwardIt first, ForwardIt last,
+               Compare comp);
+
+template<class ForwardIt, class Compare>
+HIPSYCL_STDPAR_ENTRYPOINT
+ForwardIt is_sorted_until(hipsycl::stdpar::par_unseq, ForwardIt first,
+                     ForwardIt last, Compare comp);
 ///////////////////////////// par policy /////////////////////////////
 
 template <class ForwardIt1, class ForwardIt2>
 HIPSYCL_STDPAR_ENTRYPOINT ForwardIt2 move(hipsycl::stdpar::par,
                                           ForwardIt1 first, ForwardIt1 last,
                                           ForwardIt2 d_first);
+
+template<class ForwardIt>
+HIPSYCL_STDPAR_ENTRYPOINT
+bool is_sorted(hipsycl::stdpar::par, ForwardIt first, ForwardIt last);
+
+template<class ForwardIt, class Compare>
+HIPSYCL_STDPAR_ENTRYPOINT
+bool is_sorted(hipsycl::stdpar::par, ForwardIt first, ForwardIt last,
+               Compare comp);
+
+template<class ForwardIt, class Compare>
+HIPSYCL_STDPAR_ENTRYPOINT
+ForwardIt is_sorted_until(hipsycl::stdpar::par, ForwardIt first,
+                     ForwardIt last, Compare comp);
 }
 
 #endif
